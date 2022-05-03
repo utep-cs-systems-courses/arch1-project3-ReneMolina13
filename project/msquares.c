@@ -15,19 +15,59 @@ void msquaresInit()
   positions[2].col = screenWidth-10;
   positions[2].row = screenHeight-10;
   // upper right
-  positions[3].col = screenWidth-1;
+  positions[3].col = screenWidth-10;
   positions[3].row = 10;
   // middle
   positions[4].col = screenWidth/2;
   positions[4].row = screenHeight/2;
 
   /* Fill sqColors array */
-
+  
   sqColors[0] = COLOR_BLUE;
-  sqColors[1] = COLOR_GREEN;
-  sqColors[2] = COLOR_ORANGE;
-  sqColors[3] = COLOR_BLUE;
-
+  sqColors[1] = COLOR_RED;
+  sqColors[2] = COLOR_GREEN;
+  sqColors[3] = COLOR_CYAN;
+  sqColors[4] = COLOR_MAGENTA;
+  sqColors[5] = COLOR_YELLOW;
+  sqColors[6] = COLOR_ORANGE;
+  sqColors[7] = COLOR_ORANGE_RED;
+  sqColors[8] = COLOR_DARK_ORANGE;
+  sqColors[9] = COLOR_GRAY;
+  sqColors[10] = COLOR_NAVY;
+  sqColors[11] = COLOR_ROYAL_BLUE;
+  sqColors[12] = COLOR_SKY_BLUE;
+  sqColors[13] = COLOR_TURQUOISE;
+  sqColors[14] = COLOR_STEEL_BLUE;
+  sqColors[15] = COLOR_LIGHT_BLUE;
+  sqColors[16] = COLOR_AQUAMARINE;
+  sqColors[17] = COLOR_DARK_GREEN;
+  sqColors[18] = COLOR_DARK_OLIVE_GREEN;
+  sqColors[19] = COLOR_SEA_GREEN;
+  sqColors[20] = COLOR_SPRING_GREEN;
+  sqColors[21] = COLOR_PALE_GREEN;
+  sqColors[22] = COLOR_GREEN_YELLOW;
+  sqColors[23] = COLOR_LIME_GREEN;
+  sqColors[24] = COLOR_FOREST_GREEN;
+  sqColors[25] = COLOR_KHAKI;
+  sqColors[26] = COLOR_GOLD;
+  sqColors[27] = COLOR_GOLDENROD;
+  sqColors[28] = COLOR_SIENNA;
+  sqColors[29] = COLOR_BEIGE;
+  sqColors[30] = COLOR_TAN;
+  sqColors[31] = COLOR_BROWN;
+  sqColors[32] = COLOR_CHOCOLATE;
+  sqColors[33] = COLOR_FIREBRICK;
+  sqColors[34] = COLOR_HOT_PINK;
+  sqColors[35] = COLOR_PINK;
+  sqColors[36] = COLOR_DEEP;
+  sqColors[37] = COLOR_VIOLET;
+  sqColors[38] = COLOR_DARK_VIOLE;
+  sqColors[39] = COLOR_PURPLE;
+  sqColors[40] = COLOR_MEDIUM_PURPLE;
+  sqColors[41] = COLOR_BLACK;
+  sqColors[42] = COLOR_WHITE;
+  
+  
   /* Initialize variables */
   
   current_position = 0;
@@ -38,16 +78,25 @@ void msquaresInit()
 
 
 void switch_init()
-{  
-  P2REN |= SWITCHES;		/* enables resistors for switches */
-  P2IE |= SWITCHES;		/* enable interrupts from switches */
-  P2OUT |= SWITCHES;		/* pull-ups for switches */
-  P2DIR &= ~SWITCHES;		/* set switches' bits for input */
+{
+  /* enables resistors for switches */
+  P1REN |= SW_0;
+  P2REN |= SWITCHES;
+  /* enable interrupts from switches */
+  P1IE |= SW_0;
+  P2IE |= SWITCHES;
+  /* pull-ups for switches */
+  P1OUT |= SW_0;
+  P2OUT |= SWITCHES;
+  /* set switches' bits for input */
+  P1DIR &= ~SW_0;
+  P2DIR &= ~SWITCHES;
+  
   switch_update_interrupt_sense();
 }
 
 
-// WARNING: LCD DISPLAY USES P1.0.  Do not touch!!! 
+/* note that only port 2 switches interrupt on both press & release */
 
 static char switch_update_interrupt_sense()
 {
