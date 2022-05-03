@@ -2,9 +2,9 @@
 
 void main()
 {
-  msquaresInit();
   P1DIR |= LED;		/**< Green led on when CPU on */
   P1OUT &= ~LED;
+  msquaresInit();
   configureClocks();
   lcd_init();
   switch_init();
@@ -39,7 +39,8 @@ void wdt_c_handler()
   if (posCount++ >= 16) {
     // update position
     posCount = 0;
-    redrawScreen = 1;
+    if (nextPosition != NO_CHANGE)
+      redrawScreen = 1;
   }
 
   if (fontCount++ >= 250) {
@@ -47,26 +48,6 @@ void wdt_c_handler()
     fontCount = 0;
     redrawScreen = 1;
     current_color = random(RAND_COLOR);
-  }
-
-
-
-
-  
-  
-
-   static int sec2Count = 0;
-   static int sec1Count = 0;
-   
-  if (sec2Count++ >= 125) {		/* 2/sec */
-    sec2Count = 0;
-    current_color = (current_color+1) % NUM_SQCOLORS;
-    redrawScreen = 1;
-  }
-  if (sec1Count++ >= 250) {		/* 1/sec */
-    sec1Count = 0;
-    current_position = (current_position+1) % NUM_POSITIONS;
-    redrawScreen = 1;
   }
 }
 
@@ -103,8 +84,6 @@ void switch_c_handler()
   // Combinations of port 2 switches pressed moves the pixel in the combined direction
 
   // If all port 2 switches depressed: place a box around design
-
-  redrawScreen = 1;
   
   switch (switches) {
     // left
@@ -156,38 +135,19 @@ void switch_c_handler()
     if (switchPort == 1) {
       // P1.3 buton pressed: change background to random color, type random string,
       // place a box around the string, update next font size
-      
+      redrawScreen = 1;
+      nextPosition = NO_CHANGE;
     }
 
     else if (switchPort == 2) {
       // all buttons released; make a box around work done
+      redrawScreen = 1;
       nextPosition = NO_CHANGE;
     }
     break;
     
     // conflicting buttons pressed -> no movement
   default:
-    redrawScreen = 0;
     nextPosition = NO_CHANGE;
-  }
-  
-
-
-
-
-
-
-
-
-  
-  if (switches & SWITCHES) { 	/* a switch is depresssed */
-    redrawScreen = 1;
-    for (char swNum = 0; swNum < 4; swNum++) { /* respond to lowest button pressed */
-      int swFlag = 1 << swNum;
-      if (switches & swFlag) {
-	current_position = swNum;
-	break;
-      }
-    }
-  }
+  }  
 }

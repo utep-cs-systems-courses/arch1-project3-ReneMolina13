@@ -5,21 +5,21 @@ void msquaresInit()
 {
   /* Fill positions array */
   
-  // upper left
-  positions[0].col = 10;
-  positions[0].row = 10;
-  // lower left
-  positions[1].col = 10;
-  positions[1].row = screenHeight-10;
-  // lower right
-  positions[2].col = screenWidth-10;
-  positions[2].row = screenHeight-10;
-  // upper right
-  positions[3].col = screenWidth-10;
-  positions[3].row = 10;
-  // middle
-  positions[4].col = screenWidth/2;
-  positions[4].row = screenHeight/2;
+  // upper left (index 0)
+  common_positions[UPPER_LEFT].col = 10;
+  common_positions[UPPER_LEFT].row = 10;
+  // lower left (index 1)
+  common_positions[LOWER_LEFT].col = 10;
+  common_positions[LOWER_LEFT].row = screenHeight-10;
+  // lower right (index 2)
+  common_positions[LOWER_RIGHT].col = screenWidth-10;
+  common_positions[LOWER_RIGHT].row = screenHeight-10;
+  // upper right (index 3)
+  common_positions[UPPER_RIGHT].col = screenWidth-10;
+  common_positions[UPPER_RIGHT].row = 10;
+  // middle (index 4)
+  common_positions[MIDDLE].col = screenWidth/2;
+  common_positions[MIDDLE].row = screenHeight/2;
 
   /* Fill sqColors array */
   
@@ -68,10 +68,16 @@ void msquaresInit()
   sqColors[42] = COLOR_WHITE;
 
   /* Initialize variables */
-  
-  current_position = 0;
-  current_color = 0;
-  redrawScreen = 1;
+
+  // set current/next posions, colors, & fonts
+  current_position.col = common_positions[MIDDLE].col;
+  current_position.row = common_positions[MIDDLE].row;
+  next_position = NO_CHANGE;
+  current_color = COLOR_WHITE;
+  current_font = SMALL_FONT;
+  // set control flags
+  redrawScreen = 0;
+  switchPort = 0;
   switches = 0;
 
   /* Seed random function with current time */
@@ -137,6 +143,71 @@ static char random(char type)
 
 void update_shape()
 {
+  /* holds the corners of the box to be placed around the drawing */
+  static u_short minCol = common_positions[MIDDLE].col;
+  static u_short minRow = common_positions[MIDDLE].row;
+  static u_short maxCol = common_positions[MIDDLE].col;
+  static u_short maxRow = common_positions[MIDDLE].row;
+
+
+  switch (nextPosition) {
+  case LEFT:
+    if (
+    break;
+  case UP:
+    break;
+  case DOWN:
+    break;
+  case RIGHT:
+    break;
+  case LEFT_UP:
+    break;
+  case LEFT_DOWN:
+    break;
+  case RIGHT_UP:
+    break;
+  case RIGHT_DOWN:
+    break;
+  case NO_CHANGE:
+      
+  }
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   static char last_position = 0, last_color = 0;
   redrawScreen = 0;
   int pos = current_position, color = current_color;
