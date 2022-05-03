@@ -66,8 +66,7 @@ void msquaresInit()
   sqColors[40] = COLOR_MEDIUM_PURPLE;
   sqColors[41] = COLOR_BLACK;
   sqColors[42] = COLOR_WHITE;
-  
-  
+
   /* Initialize variables */
   
   current_position = 0;
@@ -121,12 +120,17 @@ static char random(char type)
   int val = rand();
   
   switch (type) {
+  case RAND_POSITION:
+    val %= NUM_POSITIONS;
+    break;
   case RAND_COLOR:
     val %= NUM_SQCOLORS;
     break;
   case RAND_FONT:
     val %= NUM_FONTS;
+    break;
   }
+  
   return val;
 }
 
@@ -144,7 +148,7 @@ void update_shape()
   short col = positions[last_position].col;
   short row = positions[last_position].row;
   if (pos != last_position)    /* erase if position changed */
-    fillRectangle(col-5, row-5, 10, 10, BG_COLOR); 
+    fillRectangle(col-5, row-5, 10, 10, COLOR_BLACK); 
   /* draw new shape */
   col = positions[pos].col;
   row = positions[pos].row;

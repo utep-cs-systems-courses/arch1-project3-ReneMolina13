@@ -9,7 +9,7 @@ void main()
   lcd_init();
   switch_init();
   enableWDTInterrupts();      /**< enable periodic interrupt */
-  clearScreen(BG_COLOR);  
+  clearScreen(COLOR_BLACK);  
 
   while (1) {			/* forever */
     if (redrawScreen)
@@ -46,6 +46,7 @@ void wdt_c_handler()
     // update font color
     fontCount = 0;
     redrawScreen = 1;
+    current_color = random(RAND_COLOR);
   }
 
 
@@ -109,56 +110,65 @@ void switch_c_handler()
     // left
   case SW_1:
   case (SW_1 | SW_2 | SW_3):
+    nextPosition = LEFT;
     break;
     
     // up
   case SW_2:
   case (SW_2 | SW_1 | SW_4):
+    nextPosition = UP;
     break;
     
     // down
   case SW_3:
   case (SW_3 | SW_1 | SW_4):
+    nextPosition = DOWN;
     break;
     
     // right
   case SW_4:
   case (SW_4 | SW_2 | SW_3):
+    nextPosition = RIGHT;
     break;
     
     // left & up
   case (SW_1 | SW_2):
+    nextPosition = LEFT_UP;
     break;
     
     // left & down
   case (SW_1 | SW_3):
+    nextPosition = LEFT_DOWN;
     break;
     
     // right & up
   case (SW_4 | SW_2):
+    nextPosition = RIGHT_UP;
     break;
     
     // right & down
   case (SW_4 | SW_3):
+    nextPosition = RIGHT_DOWN;
     break;
     
-    // drawing complete / draw string
+    // drawing complete
   case 0:
-    if (switchCase == 1) {
+    if (switchPort == 1) {
       // P1.3 buton pressed: change background to random color, type random string,
       // place a box around the string, update next font size
       
     }
 
-    else if (switchCase == 2) {
+    else if (switchPort == 2) {
       // all buttons released; make a box around work done
-      
+      nextPosition = NO_CHANGE;
     }
     break;
     
-    // conflicting buttons pressed - no movement
+    // conflicting buttons pressed -> no movement
   default:
     redrawScreen = 0;
+    nextPosition = NO_CHANGE;
   }
   
 
