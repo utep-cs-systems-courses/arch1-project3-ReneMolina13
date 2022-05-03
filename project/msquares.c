@@ -74,6 +74,9 @@ void msquaresInit()
   current_color = 0;
   redrawScreen = 1;
   switches = 0;
+
+  /* Seed random function with current time */
+  srand(time(NULL));
 }
 
 
@@ -96,18 +99,38 @@ void switch_init()
 }
 
 
-/* note that only port 2 switches interrupt on both press & release */
+/* update switch interrupt to detect changes from current buttons */
 
 static char switch_update_interrupt_sense()
 {
   char p2val = P2IN;
-  /* update switch interrupt to detect changes from current buttons */
-  P2IES |= (p2val & SWITCHES);	/* if switch up, sense down */
-  P2IES &= (p2val | ~SWITCHES);	/* if switch down, sense up */
+  
+  /* if switch up, sense down */
+  P1IES |= (P1IN & SW_0);
+  P2IES |= (p2val & SWITCHES);
+  /* if switch down, sense up */
+  P1IES &= (P1IN | ~SW_0);
+  P2IES &= (p2val | ~SWITCHES);	
+
   return p2val;
 }
-    
-    
+
+
+static char random(char type)
+{
+  int val = rand();
+  
+  switch (type) {
+  case RAND_COLOR:
+    val %= NUM_SQCOLORS;
+    break;
+  case RAND_FONT:
+    val %= NUM_FONTS;
+  }
+  return val;
+}
+
+
 void update_shape()
 {
   static char last_position = 0, last_color = 0;
