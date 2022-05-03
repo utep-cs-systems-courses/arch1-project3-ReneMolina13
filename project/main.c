@@ -10,14 +10,14 @@ void main()
   switch_init();
   
   enableWDTInterrupts();      /**< enable periodic interrupt */
-  or_sr(0x8);	              /**< GIE (enable interrupts) */
   
   clearScreen(BG_COLOR);
   while (1) {			/* forever */
     if (redrawScreen)
       update_shape();
     P1OUT |= LED;	/* led on (sleep mode) */
-    or_sr(0x10);	/**< CPU OFF */
+    or_sr(0x18);	/**< CPU OFF, GIE ON */
+    and_sr(0xf7)        /* GIE off */
     P1OUT &= ~LED;	/* led off */
   }
 }
@@ -40,8 +40,7 @@ void wdt_c_handler()
 }
 
 
-void
-switch_interrupt_handler()
+void switch_c_handler()
 {
   char p2val = switch_update_interrupt_sense();
   switches = ~p2val & SWITCHES;
@@ -55,15 +54,5 @@ switch_interrupt_handler()
 	break;
       }
     }
-  }
-}
-
-
-/* Switch on S2 */
-void
-__interrupt_vec(PORT2_VECTOR) Port_2(){
-  if (P2IFG & SWITCHES) {	      /* did a button cause this interrupt? */
-    P2IFG &= ~SWITCHES;		      /* clear pending sw interrupts */
-    switch_interrupt_handler();	/* single handler for all switches */
   }
 }
