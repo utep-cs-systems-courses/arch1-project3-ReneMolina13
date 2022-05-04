@@ -4,7 +4,7 @@ void main()
 {
   P1DIR |= LED;		/**< Green led on when CPU on */
   P1OUT &= ~LED;
-  msquaresInit();
+  msquares_init();
   configureClocks();
   lcd_init();
   switch_init();
@@ -30,10 +30,10 @@ void wdt_c_handler()
   // will take roghly 9 seconds to go all the way across long edge
   // will take roughly 7 seconds to go all the way across short edge
 
-  // Change font color every second to a random color (not background color, black, or white)
+  // Change font color every second to a random color
 
-  static u_int posCount = 0;
-  static u_int fontCount = 0;
+  static u_char posCount = 0;
+  static u_char fontCount = 0;
 
 
   if (posCount++ >= 16) {
@@ -47,7 +47,7 @@ void wdt_c_handler()
     // update font color
     fontCount = 0;
     redrawScreen = 1;
-    current_color = random(RAND_COLOR);
+    current_font_color = random(RAND_COLOR);
   }
 }
 
@@ -129,21 +129,14 @@ void switch_c_handler()
   case (SW_4 | SW_3):
     nextPosition = RIGHT_DOWN;
     break;
-    
-    // drawing complete
-  case 0:
-    if (switchPort == 1) {
-      // P1.3 buton pressed: change background to random color, type random string,
-      // place a box around the string, update next font size
-      redrawScreen = 1;
-      nextPosition = NO_CHANGE;
-    }
 
-    else if (switchPort == 2) {
-      // all buttons released; make a box around work done
-      redrawScreen = 1;
-      nextPosition = NO_CHANGE;
-    }
+    // drawing complete -> change screen immediately
+  case 0:
+    // Accounts for 2 cases:
+    // all P2 switches being released or
+    // SW_0 (P1.3) pressed & all P2 switches released
+    nextPosition = NO_CHANGE;
+    redrawScreen = 1;
     break;
     
     // conflicting buttons pressed -> no movement

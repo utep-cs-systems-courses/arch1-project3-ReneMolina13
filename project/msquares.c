@@ -1,7 +1,7 @@
 #include "msquares.h"
 
 
-void msquaresInit()
+void msquares_init()
 {
   /* Fill positions array */
   
@@ -21,51 +21,51 @@ void msquaresInit()
   common_positions[MIDDLE].col = screenWidth/2;
   common_positions[MIDDLE].row = screenHeight/2;
 
-  /* Fill sqColors array */
+  /* Fill colors array (macros are BGR) */
   
-  sqColors[0] = COLOR_BLUE;
-  sqColors[1] = COLOR_RED;
-  sqColors[2] = COLOR_GREEN;
-  sqColors[3] = COLOR_CYAN;
-  sqColors[4] = COLOR_MAGENTA;
-  sqColors[5] = COLOR_YELLOW;
-  sqColors[6] = COLOR_ORANGE;
-  sqColors[7] = COLOR_ORANGE_RED;
-  sqColors[8] = COLOR_DARK_ORANGE;
-  sqColors[9] = COLOR_GRAY;
-  sqColors[10] = COLOR_NAVY;
-  sqColors[11] = COLOR_ROYAL_BLUE;
-  sqColors[12] = COLOR_SKY_BLUE;
-  sqColors[13] = COLOR_TURQUOISE;
-  sqColors[14] = COLOR_STEEL_BLUE;
-  sqColors[15] = COLOR_LIGHT_BLUE;
-  sqColors[16] = COLOR_AQUAMARINE;
-  sqColors[17] = COLOR_DARK_GREEN;
-  sqColors[18] = COLOR_DARK_OLIVE_GREEN;
-  sqColors[19] = COLOR_SEA_GREEN;
-  sqColors[20] = COLOR_SPRING_GREEN;
-  sqColors[21] = COLOR_PALE_GREEN;
-  sqColors[22] = COLOR_GREEN_YELLOW;
-  sqColors[23] = COLOR_LIME_GREEN;
-  sqColors[24] = COLOR_FOREST_GREEN;
-  sqColors[25] = COLOR_KHAKI;
-  sqColors[26] = COLOR_GOLD;
-  sqColors[27] = COLOR_GOLDENROD;
-  sqColors[28] = COLOR_SIENNA;
-  sqColors[29] = COLOR_BEIGE;
-  sqColors[30] = COLOR_TAN;
-  sqColors[31] = COLOR_BROWN;
-  sqColors[32] = COLOR_CHOCOLATE;
-  sqColors[33] = COLOR_FIREBRICK;
-  sqColors[34] = COLOR_HOT_PINK;
-  sqColors[35] = COLOR_PINK;
-  sqColors[36] = COLOR_DEEP;
-  sqColors[37] = COLOR_VIOLET;
-  sqColors[38] = COLOR_DARK_VIOLE;
-  sqColors[39] = COLOR_PURPLE;
-  sqColors[40] = COLOR_MEDIUM_PURPLE;
-  sqColors[41] = COLOR_BLACK;
-  sqColors[42] = COLOR_WHITE;
+  colors[0] = COLOR_BLUE;
+  colors[1] = COLOR_RED;
+  colors[2] = COLOR_GREEN;
+  colors[3] = COLOR_CYAN;
+  colors[4] = COLOR_MAGENTA;
+  colors[5] = COLOR_YELLOW;
+  colors[6] = COLOR_ORANGE;
+  colors[7] = COLOR_ORANGE_RED;
+  colors[8] = COLOR_DARK_ORANGE;
+  colors[9] = COLOR_GRAY;
+  colors[10] = COLOR_NAVY;
+  colors[11] = COLOR_ROYAL_BLUE;
+  colors[12] = COLOR_SKY_BLUE;
+  colors[13] = COLOR_TURQUOISE;
+  colors[14] = COLOR_STEEL_BLUE;
+  colors[15] = COLOR_LIGHT_BLUE;
+  colors[16] = COLOR_AQUAMARINE;
+  colors[17] = COLOR_DARK_GREEN;
+  colors[18] = COLOR_DARK_OLIVE_GREEN;
+  colors[19] = COLOR_SEA_GREEN;
+  colors[20] = COLOR_SPRING_GREEN;
+  colors[21] = COLOR_PALE_GREEN;
+  colors[22] = COLOR_GREEN_YELLOW;
+  colors[23] = COLOR_LIME_GREEN;
+  colors[24] = COLOR_FOREST_GREEN;
+  colors[25] = COLOR_KHAKI;
+  colors[26] = COLOR_GOLD;
+  colors[27] = COLOR_GOLDENROD;
+  colors[28] = COLOR_SIENNA;
+  colors[29] = COLOR_BEIGE;
+  colors[30] = COLOR_TAN;
+  colors[31] = COLOR_BROWN;
+  colors[32] = COLOR_CHOCOLATE;
+  colors[33] = COLOR_FIREBRICK;
+  colors[34] = COLOR_HOT_PINK;
+  colors[35] = COLOR_PINK;
+  colors[36] = COLOR_DEEP;
+  colors[37] = COLOR_VIOLET;
+  colors[38] = COLOR_DARK_VIOLE;
+  colors[39] = COLOR_PURPLE;
+  colors[40] = COLOR_MEDIUM_PURPLE;
+  colors[41] = COLOR_BLACK;
+  colors[42] = COLOR_WHITE;
 
   /* Initialize variables */
 
@@ -73,8 +73,13 @@ void msquaresInit()
   current_position.col = common_positions[MIDDLE].col;
   current_position.row = common_positions[MIDDLE].row;
   next_position = NO_CHANGE;
-  current_color = COLOR_WHITE;
+  current_font_color = 42; // white
+  current_background = 41; // black
   current_font = SMALL_FONT;
+  minCol = common_positions[MIDDLE].col;
+  minRow = common_positions[MIDDLE].row;
+  maxCol = common_positions[MIDDLE].col;
+  maxRow = common_positions[MIDDLE].row;
   // set control flags
   redrawScreen = 0;
   switchPort = 0;
@@ -123,37 +128,24 @@ static u_char switch_update_interrupt_sense()
 
 static u_char random(u_char type)
 {
-  u_int val = rand();
+  u_char val;
   
   switch (type) {
   case RAND_POSITION:
-    val %= NUM_POSITIONS;
+    val = rand() % NUM_POSITIONS;
     break;
   case RAND_COLOR:
-    val %= NUM_SQCOLORS;
+    val = rand() % NUM_COLORS;
     break;
   case RAND_FONT:
-    val %= NUM_FONTS;
-    break;
+    val = rand() % NUM_FONTS;
   }
   
   return val;
 }
 
-
-void update_shape()
+void update_position(u_char col, u_char row)
 {
-  // holds the corners of the box to be placed around the drawing
-  static u_int minCol = common_positions[MIDDLE].col;
-  static u_int minRow = common_positions[MIDDLE].row;
-  static u_int maxCol = common_positions[MIDDLE].col;
-  static u_int maxRow = common_positions[MIDDLE].row;
-
-  // temp variables for current position (for readability)
-  u_int col = current_position.col;
-  u_int row = current_position.row;
-
-  
   /* Update current position*/
   
   switch (nextPosition) {
@@ -203,6 +195,10 @@ void update_shape()
       col++;
     if (row <= screenHeight-10)
       row++;
+    break;
+    
+  case NO_CHANGE:
+    return;
   }
 
   // compare to min & max values
@@ -215,6 +211,38 @@ void update_shape()
   else if (col < minCol)
     minCol = col;
   
+  // draw pixel at current position
+  drawPixel(col, row, colors[current_font_color]);
+
+  // update current position global variables
+  current_position.col = col;
+  current_position.row = row;
+}
+
+
+void update_shape()
+{
+  /* update current position */
+  
+  updatePosition(current_position.col, current_position.row);
+
+  /* if no position change, determine if interrupt caused by SW_0 */
+  if (switchPort == 1) {
+    // P1.3 buton pressed: change background to random color, type random string,
+    // place a box around the string, update next font size
+    redrawScreen = 1;
+    nextPosition = NO_CHANGE;
+  }
+
+  else if (switchPort == 2) {
+    // all buttons released; make a box around work done
+    redrawScreen = 1;
+    nextPosition = NO_CHANGE;
+  }
+
+
+  
+  
   
 
 
@@ -233,10 +261,8 @@ void update_shape()
 
 
 
-
-  current_position.col = col;
-  current_position.row = row;
-
+  
+  redrawScreen = 0;
 
 
 
@@ -254,7 +280,7 @@ void update_shape()
 
   static char last_position = 0, last_color = 0;
   redrawScreen = 0;
-  int pos = current_position, color = current_color;
+  int pos = current_position, color = current_background;
 
   if (pos == last_position && color == last_color) /* nothing to redraw */
     return;
@@ -267,7 +293,7 @@ void update_shape()
   /* draw new shape */
   col = positions[pos].col;
   row = positions[pos].row;
-  fillRectangle(col-5, row-5, 10, 10, sqColors[color]); /* draw new shape */
+  fillRectangle(col-5, row-5, 10, 10, colors[color]); /* draw new shape */
   /* remember color & pos for next redraw */
   last_position = pos;
   last_color = color;

@@ -18,7 +18,7 @@
 
 /* Array sizes */
 #define NUM_POSITIONS 5
-#define NUM_SQCOLORS 43
+#define NUM_COLORS 43
 
 /* common_positions array indices */
 #define UPPER_LEFT  0
@@ -65,12 +65,12 @@
 
 /* structure indicating a position on LCD screen */
 typedef struct {
-  u_int col, row;
+  u_char col, row;
 } Pos;
 
 /* position & color arrays */
 Pos common_positions[NUM_POSITIONS]; // holds an array of common LCD position
-u_int sqColors[NUM_SQCOLORS];        // holds an array of LCD colors
+u_int colors[NUM_COLORS];        // holds an array of LCD colors
 
 
 
@@ -79,15 +79,21 @@ u_int sqColors[NUM_SQCOLORS];        // holds an array of LCD colors
 
 
 /* current/next positions, colors, & fonts */
-Pos current_position; // holds the current pixel position
-u_char next_position; // holds the direction of the next pixel position
-u_char current_color; // holds the current color that will be drawn
-u_char current_font;  // holds the value of the current font
+Pos current_position;      // holds the current pixel position
+u_char next_position;      // holds the direction of the next pixel position
+u_char current_font_color; // holds a current index of the colors array
+u_char current_background; // holds a current index of the colors array
+u_char current_font;       // holds the value of the current font
+// holds the corners of the box to be placed around the drawing
+u_char minCol;
+u_char minRow;
+u_char maxCol;
+u_char maxRow;
 
 /* control flags */
-u_int redrawScreen;   // flag that determines if a new draw operation is needed
-u_int switchPort;     // flag that determines if the pressed switch is P1 or P
-u_int switches;       // holds the switches that are currently pressed
+u_char redrawScreen;       // flag that determines if a new draw operation is needed
+u_char switchPort;         // flag that determines if the pressed switch is P1 or P2
+u_char switches;           // holds the Port 2 switches currently pressed
 
 
 
@@ -95,10 +101,11 @@ u_int switches;       // holds the switches that are currently pressed
 /* FUNCTIONS */
 
 
-void msquaresInit();                           // initializes miscellaneous items
+void msquares_init();                          // initializes miscellaneous items
 void switch_init();                            // initializes switches
 static u_char switch_update_interrupt_sense(); // ensures button interrupt on both press & release
 static u_char random(u_char type);             // provides either a random font or color
+void update_position(u_char col, u_char row);  // updates the position of the drawing
 void update_shape();                           // updates the shape on LCD screen
 
 
