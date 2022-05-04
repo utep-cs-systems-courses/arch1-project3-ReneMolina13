@@ -32,8 +32,8 @@ void wdt_c_handler()
 
   // Change font color every second to a random color (not background color, black, or white)
 
-  static int posCount = 0;
-  static int fontCount = 0;
+  static u_int posCount = 0;
+  static u_int fontCount = 0;
 
 
   if (posCount++ >= 16) {
@@ -54,8 +54,8 @@ void wdt_c_handler()
 
 void switch_c_handler()
 {
-  char p1val = ~P1IN & SW_0;
-  char p2val = switch_update_interrupt_sense();
+  u_char p1val = ~P1IN & SW_0;
+  u_char p2val = switch_update_interrupt_sense();
   switches = ~p2val & SWITCHES;
 
   /* New State Machine */

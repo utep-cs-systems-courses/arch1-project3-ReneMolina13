@@ -106,9 +106,9 @@ void switch_init()
 
 /* update switch interrupt to detect changes from current buttons */
 
-static char switch_update_interrupt_sense()
+static u_char switch_update_interrupt_sense()
 {
-  char p2val = P2IN;
+  u_char p2val = P2IN;
   
   /* if switch up, sense down */
   P1IES |= (P1IN & SW_0);
@@ -121,9 +121,9 @@ static char switch_update_interrupt_sense()
 }
 
 
-static char random(char type)
+static u_char random(u_char type)
 {
-  int val = rand();
+  u_int val = rand();
   
   switch (type) {
   case RAND_POSITION:
@@ -143,34 +143,78 @@ static char random(char type)
 
 void update_shape()
 {
-  /* holds the corners of the box to be placed around the drawing */
-  static u_short minCol = common_positions[MIDDLE].col;
-  static u_short minRow = common_positions[MIDDLE].row;
-  static u_short maxCol = common_positions[MIDDLE].col;
-  static u_short maxRow = common_positions[MIDDLE].row;
+  // holds the corners of the box to be placed around the drawing
+  static u_int minCol = common_positions[MIDDLE].col;
+  static u_int minRow = common_positions[MIDDLE].row;
+  static u_int maxCol = common_positions[MIDDLE].col;
+  static u_int maxRow = common_positions[MIDDLE].row;
 
+  // temp variables for current position (for readability)
+  u_int col = current_position.col;
+  u_int row = current_position.row;
 
+  
+  /* Update current position*/
+  
   switch (nextPosition) {
   case LEFT:
-    if (
+    if (col >= 10)
+      col--;
     break;
+    
   case UP:
+    if (row >= 10)
+      row--;
     break;
+    
   case DOWN:
+    if (row <= screenHeight-10)
+      row++;
     break;
+    
   case RIGHT:
+    if (col <= screenWidth-10)
+      col++;
     break;
+    
   case LEFT_UP:
+    if (col >= 10)
+      col--;
+    if (row >= 10)
+      row--;    
     break;
+    
   case LEFT_DOWN:
+    if (col >= 10)
+      col--;
+    if (row <= screenHeight-10)
+      row++;
     break;
+    
   case RIGHT_UP:
+    if (col <= screenWidth-10)
+      col++;
+    if (row >= 10)
+      row--;
     break;
+    
   case RIGHT_DOWN:
-    break;
-  case NO_CHANGE:
-      
+    if (col <= screenWidth-10)
+      col++;
+    if (row <= screenHeight-10)
+      row++;
   }
+
+  // compare to min & max values
+  if (row > maxRow)
+    maxRow = row;
+  else if (row < minRow)
+    minRow = row;
+  if (col > maxCol)
+    maxCol = col;
+  else if (col < minCol)
+    minCol = col;
+  
   
 
 
@@ -190,8 +234,8 @@ void update_shape()
 
 
 
-
-  
+  current_position.col = col;
+  current_position.row = row;
 
 
 
