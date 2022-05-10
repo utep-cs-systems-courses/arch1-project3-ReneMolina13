@@ -32,22 +32,34 @@ void wdt_c_handler()
 
   // Change font color every second to a random color
 
+  // Check every 5 seconds if screen must be reset
+  // If screen must be reset, no other inputs will do anything
+
   static u_char posCount = 0;
   static u_char fontCount = 0;
+  static u_int resetCount = 0;
 
 
   if (posCount++ >= 16) {
     // update position
     posCount = 0;
-    if (nextPosition != NO_CHANGE)
+    if (nextPosition != NO_CHANGE && resetScreen == 0)
       redrawScreen = 1;
   }
 
   if (fontCount++ >= 250) {
     // update font color
     fontCount = 0;
+    if (resetScreen == 0) {
+      redrawScreen = 1;
+      current_font_color = random(RAND_COLOR);
+    }
+  }
+
+  if (resetCount++ >= 1250) {
+    // emable screen reset
+    resetCount = 0;
     redrawScreen = 1;
-    current_font_color = random(RAND_COLOR);
   }
 }
 
@@ -60,10 +72,8 @@ void switch_c_handler()
 
   /* New State Machine */
 
-  // If switch 0 pressed: change background to random color, type a random string,
-  // place a box around characters, update next font
-
-  // If switch 0 unpressed: clear screen, move current position to one of the default locations
+  // If switch 0 pressed: change background to random color & type a random string
+  // activates resetScreen flag
 
   // If switch 1 pressed: place a pixel, move 1 pixel left (if possible)
 
@@ -84,6 +94,7 @@ void switch_c_handler()
   // Combinations of port 2 switches pressed moves the pixel in the combined direction
 
   // If all port 2 switches depressed: place a box around design
+  // activates resetScreen flag
   
   switch (switches) {
     // left

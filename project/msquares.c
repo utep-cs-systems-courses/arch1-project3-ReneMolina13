@@ -69,6 +69,9 @@ void msquares_init()
 
   /* Initialize variables */
 
+  // set null-terminator on string
+  str[STR_LENGTH-1] = 0;
+
   // set current/next posions, colors, & fonts
   current_position.col = common_positions[MIDDLE].col;
   current_position.row = common_positions[MIDDLE].row;
@@ -81,6 +84,7 @@ void msquares_init()
   maxCol = common_positions[MIDDLE].col;
   maxRow = common_positions[MIDDLE].row;
   // set control flags
+  clearScreen = 0;
   redrawScreen = 0;
   switchPort = 0;
   switches = 0;
@@ -116,10 +120,8 @@ static u_char switch_update_interrupt_sense()
   u_char p2val = P2IN;
   
   /* if switch up, sense down */
-  P1IES |= (P1IN & SW_0);
   P2IES |= (p2val & SWITCHES);
   /* if switch down, sense up */
-  P1IES &= (P1IN | ~SW_0);
   P2IES &= (p2val | ~SWITCHES);	
 
   return p2val;
@@ -137,8 +139,11 @@ static u_char random(u_char type)
   case RAND_COLOR:
     val = rand() % NUM_COLORS;
     break;
-  case RAND_FONT:
-    val = rand() % NUM_FONTS;
+  case RAND_CHARACTER:
+    val = rand() % NUM_CHARACTERS;
+    val += 65; // brings val=0 to 'A'
+    if (val > 90)
+      val += 6; // if not uppercase, make lowercase
   }
   
   return val;
@@ -222,79 +227,82 @@ void update_position(u_char col, u_char row)
 
 void update_shape()
 {
-  /* update current position */
+  /* check if screen must be cleared */
+  if (resetScreen == 1) {
+    // lower resetScreen flag
+    resetScreen = 0;
+    // clear drawing and set random background
+    current_background = random(RAND_COLOR);
+    clearScreen(colors[current_background]);
+    // reset cursor to random position
+    u_char randIndex = random(RAND_POSITION);
+    currentPostion.col = common_positions[randIndex].col;
+    currentPosition.row = common_positions[randIndex].row;
+  }
   
-  updatePosition(current_position.col, current_position.row);
-
   /* if no position change, determine if interrupt caused by SW_0 */
-  if (switchPort == 1) {
-    // P1.3 buton pressed: change background to random color, type random string,
-    // place a box around the string, update next font size
-    redrawScreen = 1;
-    nextPosition = NO_CHANGE;
+  else if (nextPosition == NO_CHANGE) {
+    // P1.3 buton pressed
+    if (switchPort == 1) {
+      // randomly change background and font colors
+      current_background = random(RAND_COLOR);
+      current_font_color = random(RAND_COLOR);
+      u_int string_backgound = colors[current_background];
+      u_int string_font_color = colors[current_font_color];
+
+      // set a random (common) position for the string
+      u_char randIndex = random(RAND_POSITION);
+      u_char stringCol = common_positions[randIndex].col;
+      u_char stringRow = common_positions[randIndex].row;
+
+      // type random string
+      int i;
+      u_char c;
+
+      // generate random string
+      for (i = 0; i < STR_LENGTH-1; i++)
+	str[i] = random(RAND_CHARACTER);
+      
+      // print random string
+      for (i = 0; i < STR_LENGTH; i++) {
+	// ensure there is room for the character
+	if (stringCol + WIDTH_5x7 > screenWidth-10) {
+	  stringCol = 10;
+	  stringRow += (HEIGHT_5x7)+1;
+	}
+	if (stringRow + HEIGHT_5x7 > screenHeight-10) {
+	  stringCol = 10;
+	  stringRow = 10;
+	}
+	// print character and move to next character location
+	drawChar5x7(stringCol, stringRow, str[i], string_font_color, string_background);
+	stringCol += (WIDTH_5x7)+1;
+	stringRow += (HEIGHT_5x7)+1;
+      }
+
+      // raise resetScreen flag (holds drawing for 5 seconds before resetting)
+      resetScreen = 1;
+    }
+
+    // all buttons released
+    else if (switchPort == 2) {
+      // make a box around work done
+      maxRow += 10;
+      maxCol += 10;
+      minRow -= 10;
+      minCol -= 10;
+      u_char width = maxRow - minRow;
+      u_char height = maxCol - minCol;
+      drawRectOutline(minCol, minRow, width, height, colors[current_font_color]);
+      // raise resetScreen flag (holds drawing for 5 seconds before resetting)
+      resetScreen = 1;
+    }
   }
 
-  else if (switchPort == 2) {
-    // all buttons released; make a box around work done
-    redrawScreen = 1;
-    nextPosition = NO_CHANGE;
-  }
+  /* otherwise, update current position */
+  else
+    updatePosition(current_position.col, current_position.row);
 
-
-  
-  
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
+  // lower redrawScreen flag
   redrawScreen = 0;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  static char last_position = 0, last_color = 0;
-  redrawScreen = 0;
-  int pos = current_position, color = current_background;
-
-  if (pos == last_position && color == last_color) /* nothing to redraw */
-    return;
-
-  /* erase old shape */
-  short col = positions[last_position].col;
-  short row = positions[last_position].row;
-  if (pos != last_position)    /* erase if position changed */
-    fillRectangle(col-5, row-5, 10, 10, COLOR_BLACK); 
-  /* draw new shape */
-  col = positions[pos].col;
-  row = positions[pos].row;
-  fillRectangle(col-5, row-5, 10, 10, colors[color]); /* draw new shape */
-  /* remember color & pos for next redraw */
-  last_position = pos;
-  last_color = color;
 }

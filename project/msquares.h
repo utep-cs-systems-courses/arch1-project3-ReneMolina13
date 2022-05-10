@@ -19,6 +19,8 @@
 /* Array sizes */
 #define NUM_POSITIONS 5
 #define NUM_COLORS 43
+#define STR_LENGTH 5
+#define NUM_CHARACTERS 52
 
 /* common_positions array indices */
 #define UPPER_LEFT  0
@@ -37,14 +39,9 @@
 #define SW_4 8      // P2.3
 
 /* Used as flags for random function */
-#define RAND_POSITION 0
-#define RAND_COLOR    1 
-#define RAND_FONT     2  
-
-/* Represents fonts in the current_font variable */
-#define SMALL_FONT   0
-#define MEDIUTM_FONT 1
-#define LARGE_FONT   2
+#define RAND_POSITION  0
+#define RAND_COLOR     1 
+#define RAND_CHARACTER 2
 
 /* Represents directions in the next_position variable */
 #define LEFT       0
@@ -56,6 +53,10 @@
 #define RIGHT_UP   6
 #define RIGHT_DOWN 7
 #define NO_CHANGE  8
+
+/* Defines character widths & heights */
+#define HEIGHT_5x7 7
+#define WIDTH_5x7  5
 
 
 
@@ -70,9 +71,8 @@ typedef struct {
 
 /* position & color arrays */
 Pos common_positions[NUM_POSITIONS]; // holds an array of common LCD position
-u_int colors[NUM_COLORS];        // holds an array of LCD colors
-
-
+u_int colors[NUM_COLORS];            // holds an array of LCD colors
+u_char str[STR_LENGTH];              // holds a string to be displayed
 
 
 /* VARIABLES */
@@ -84,13 +84,15 @@ u_char next_position;      // holds the direction of the next pixel position
 u_char current_font_color; // holds a current index of the colors array
 u_char current_background; // holds a current index of the colors array
 u_char current_font;       // holds the value of the current font
-// holds the corners of the box to be placed around the drawing
+
+/* holds the corners of the box to be placed around the drawing */
 u_char minCol;
 u_char minRow;
 u_char maxCol;
 u_char maxRow;
 
 /* control flags */
+u_char resetScreen;        // flag that is set when the screen must be cleared
 u_char redrawScreen;       // flag that determines if a new draw operation is needed
 u_char switchPort;         // flag that determines if the pressed switch is P1 or P2
 u_char switches;           // holds the Port 2 switches currently pressed
