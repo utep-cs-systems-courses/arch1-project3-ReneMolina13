@@ -4,7 +4,6 @@
 
 #include <msp430.h>
 #include <stdlib.h>
-#include <time.h>
 #include <libTimer.h>
 #include "lcdutils.h"
 #include "lcddraw.h"
@@ -71,7 +70,7 @@ typedef struct {
 
 /* position & color arrays */
 Pos common_positions[NUM_POSITIONS]; // holds an array of common LCD position
-u_int colors[NUM_COLORS];            // holds an array of LCD colors
+u_int msColors[NUM_COLORS];          // holds an array of LCD colors
 u_char str[STR_LENGTH];              // holds a string to be displayed
 
 
@@ -83,7 +82,6 @@ Pos current_position;      // holds the current pixel position
 u_char next_position;      // holds the direction of the next pixel position
 u_char current_font_color; // holds a current index of the colors array
 u_char current_background; // holds a current index of the colors array
-u_char current_font;       // holds the value of the current font
 
 /* holds the corners of the box to be placed around the drawing */
 u_char minCol;
@@ -103,12 +101,12 @@ u_char switches;           // holds the Port 2 switches currently pressed
 /* FUNCTIONS */
 
 
-void msquares_init();                          // initializes miscellaneous items
-void switch_init();                            // initializes switches
-static u_char switch_update_interrupt_sense(); // ensures button interrupt on both press & release
-static u_char random(u_char type);             // provides either a random font or color
-void update_position(u_char col, u_char row);  // updates the position of the drawing
-void update_shape();                           // updates the shape on LCD screen
+void msquares_init();                         // initializes miscellaneous items
+void switch_init();                           // initializes switches
+u_char switch_update_interrupt_sense();       // ensures button interrupt on both press & release
+u_char msRand(u_char type);                   // provides either a random font or color
+void update_position(u_char col, u_char row); // updates the position of the drawing
+void update_shape();                          // updates the shape on LCD screen
 
 
 #endif /* MSQUARES */

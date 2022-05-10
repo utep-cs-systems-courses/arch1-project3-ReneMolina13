@@ -2,7 +2,7 @@
 	.text
 	.balign	2
 	.global Port_1
-	.global	Port_2
+	.global	Port_2		
 	.section	__interrupt_vector_3, "ax"
 	.word	Port_1
 	.section	__interrupt_vector_4, "ax"
@@ -15,7 +15,8 @@
 	.extern	switch_c_handler
 Port_1:
 	sub	#2, R1
-	mov	&P1IFG, 0(R1)
+	mov	P1IFG, R15
+	mov	0(R15), 0(R1)
 	and	#8, 0(R1)
 	cmp	#0, 0(R1)
 	jz	done_1
@@ -60,7 +61,8 @@ dont_wake_1:
 	
 Port_2:
 	sub	#2, R1
-	mov	&P2IFG, 0(R1)
+	mov	P2IFG, R15
+	mov	0(R15), 0(R1)
 	and	#15, 0(R1)
 	cmp	#0, 0(R1)
 	jz	done_2
@@ -101,3 +103,4 @@ done_2:
 	and	#0xffef, 0(R1)	; clear CPU off
 dont_wake_2:
 	RETI
+	

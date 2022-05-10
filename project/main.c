@@ -16,7 +16,7 @@ void main()
       update_shape();
     P1OUT |= LED;	/* led on (sleep mode) */
     or_sr(0x18);	/**< CPU OFF, GIE ON */
-    and_sr(0xf7)        /* GIE off */
+    and_sr(0xf7);       /* GIE off */
     P1OUT &= ~LED;	/* led off */
   }
 }
@@ -43,7 +43,7 @@ void wdt_c_handler()
   if (posCount++ >= 16) {
     // update position
     posCount = 0;
-    if (nextPosition != NO_CHANGE && resetScreen == 0)
+    if (next_position != NO_CHANGE && resetScreen == 0)
       redrawScreen = 1;
   }
 
@@ -52,7 +52,7 @@ void wdt_c_handler()
     fontCount = 0;
     if (resetScreen == 0) {
       redrawScreen = 1;
-      current_font_color = random(RAND_COLOR);
+      current_font_color = msRand(RAND_COLOR);
     }
   }
 
@@ -100,45 +100,45 @@ void switch_c_handler()
     // left
   case SW_1:
   case (SW_1 | SW_2 | SW_3):
-    nextPosition = LEFT;
+    next_position = LEFT;
     break;
     
     // up
   case SW_2:
   case (SW_2 | SW_1 | SW_4):
-    nextPosition = UP;
+    next_position = UP;
     break;
     
     // down
   case SW_3:
   case (SW_3 | SW_1 | SW_4):
-    nextPosition = DOWN;
+    next_position = DOWN;
     break;
     
     // right
   case SW_4:
   case (SW_4 | SW_2 | SW_3):
-    nextPosition = RIGHT;
+    next_position = RIGHT;
     break;
     
     // left & up
   case (SW_1 | SW_2):
-    nextPosition = LEFT_UP;
+    next_position = LEFT_UP;
     break;
     
     // left & down
   case (SW_1 | SW_3):
-    nextPosition = LEFT_DOWN;
+    next_position = LEFT_DOWN;
     break;
     
     // right & up
   case (SW_4 | SW_2):
-    nextPosition = RIGHT_UP;
+    next_position = RIGHT_UP;
     break;
     
     // right & down
   case (SW_4 | SW_3):
-    nextPosition = RIGHT_DOWN;
+    next_position = RIGHT_DOWN;
     break;
 
     // drawing complete -> change screen immediately
@@ -146,12 +146,12 @@ void switch_c_handler()
     // Accounts for 2 cases:
     // all P2 switches being released or
     // SW_0 (P1.3) pressed & all P2 switches released
-    nextPosition = NO_CHANGE;
+    next_position = NO_CHANGE;
     redrawScreen = 1;
     break;
     
     // conflicting buttons pressed -> no movement
   default:
-    nextPosition = NO_CHANGE;
+    next_position = NO_CHANGE;
   }  
 }

@@ -23,49 +23,49 @@ void msquares_init()
 
   /* Fill colors array (macros are BGR) */
   
-  colors[0] = COLOR_BLUE;
-  colors[1] = COLOR_RED;
-  colors[2] = COLOR_GREEN;
-  colors[3] = COLOR_CYAN;
-  colors[4] = COLOR_MAGENTA;
-  colors[5] = COLOR_YELLOW;
-  colors[6] = COLOR_ORANGE;
-  colors[7] = COLOR_ORANGE_RED;
-  colors[8] = COLOR_DARK_ORANGE;
-  colors[9] = COLOR_GRAY;
-  colors[10] = COLOR_NAVY;
-  colors[11] = COLOR_ROYAL_BLUE;
-  colors[12] = COLOR_SKY_BLUE;
-  colors[13] = COLOR_TURQUOISE;
-  colors[14] = COLOR_STEEL_BLUE;
-  colors[15] = COLOR_LIGHT_BLUE;
-  colors[16] = COLOR_AQUAMARINE;
-  colors[17] = COLOR_DARK_GREEN;
-  colors[18] = COLOR_DARK_OLIVE_GREEN;
-  colors[19] = COLOR_SEA_GREEN;
-  colors[20] = COLOR_SPRING_GREEN;
-  colors[21] = COLOR_PALE_GREEN;
-  colors[22] = COLOR_GREEN_YELLOW;
-  colors[23] = COLOR_LIME_GREEN;
-  colors[24] = COLOR_FOREST_GREEN;
-  colors[25] = COLOR_KHAKI;
-  colors[26] = COLOR_GOLD;
-  colors[27] = COLOR_GOLDENROD;
-  colors[28] = COLOR_SIENNA;
-  colors[29] = COLOR_BEIGE;
-  colors[30] = COLOR_TAN;
-  colors[31] = COLOR_BROWN;
-  colors[32] = COLOR_CHOCOLATE;
-  colors[33] = COLOR_FIREBRICK;
-  colors[34] = COLOR_HOT_PINK;
-  colors[35] = COLOR_PINK;
-  colors[36] = COLOR_DEEP;
-  colors[37] = COLOR_VIOLET;
-  colors[38] = COLOR_DARK_VIOLE;
-  colors[39] = COLOR_PURPLE;
-  colors[40] = COLOR_MEDIUM_PURPLE;
-  colors[41] = COLOR_BLACK;
-  colors[42] = COLOR_WHITE;
+  msColors[0] = COLOR_BLUE;
+  msColors[1] = COLOR_RED;
+  msColors[2] = COLOR_GREEN;
+  msColors[3] = COLOR_CYAN;
+  msColors[4] = COLOR_MAGENTA;
+  msColors[5] = COLOR_YELLOW;
+  msColors[6] = COLOR_ORANGE;
+  msColors[7] = COLOR_ORANGE_RED;
+  msColors[8] = COLOR_DARK_ORANGE;
+  msColors[9] = COLOR_GRAY;
+  msColors[10] = COLOR_NAVY;
+  msColors[11] = COLOR_ROYAL_BLUE;
+  msColors[12] = COLOR_SKY_BLUE;
+  msColors[13] = COLOR_TURQUOISE;
+  msColors[14] = COLOR_STEEL_BLUE;
+  msColors[15] = COLOR_LIGHT_BLUE;
+  msColors[16] = COLOR_AQUAMARINE;
+  msColors[17] = COLOR_DARK_GREEN;
+  msColors[18] = COLOR_DARK_OLIVE_GREEN;
+  msColors[19] = COLOR_SEA_GREEN;
+  msColors[20] = COLOR_SPRING_GREEN;
+  msColors[21] = COLOR_PALE_GREEN;
+  msColors[22] = COLOR_GREEN_YELLOW;
+  msColors[23] = COLOR_LIME_GREEN;
+  msColors[24] = COLOR_FOREST_GREEN;
+  msColors[25] = COLOR_KHAKI;
+  msColors[26] = COLOR_GOLD;
+  msColors[27] = COLOR_GOLDENROD;
+  msColors[28] = COLOR_SIENNA;
+  msColors[29] = COLOR_BEIGE;
+  msColors[30] = COLOR_TAN;
+  msColors[31] = COLOR_BROWN;
+  msColors[32] = COLOR_CHOCOLATE;
+  msColors[33] = COLOR_FIREBRICK;
+  msColors[34] = COLOR_HOT_PINK;
+  msColors[35] = COLOR_PINK;
+  msColors[36] = COLOR_DEEP;
+  msColors[37] = COLOR_VIOLET;
+  msColors[38] = COLOR_DARK_VIOLE;
+  msColors[39] = COLOR_PURPLE;
+  msColors[40] = COLOR_MEDIUM_PURPLE;
+  msColors[41] = COLOR_BLACK;
+  msColors[42] = COLOR_WHITE;
 
   /* Initialize variables */
 
@@ -78,19 +78,15 @@ void msquares_init()
   next_position = NO_CHANGE;
   current_font_color = 42; // white
   current_background = 41; // black
-  current_font = SMALL_FONT;
   minCol = common_positions[MIDDLE].col;
   minRow = common_positions[MIDDLE].row;
   maxCol = common_positions[MIDDLE].col;
   maxRow = common_positions[MIDDLE].row;
   // set control flags
-  clearScreen = 0;
+  resetScreen = 0;
   redrawScreen = 0;
   switchPort = 0;
   switches = 0;
-
-  /* Seed random function with current time */
-  srand(time(NULL));
 }
 
 
@@ -105,17 +101,18 @@ void switch_init()
   /* pull-ups for switches */
   P1OUT |= SW_0;
   P2OUT |= SWITCHES;
+  /* set interrupt sense on press */
+  P1IES |= SW_0;
+  P2IES |= SWITCHES;
   /* set switches' bits for input */
   P1DIR &= ~SW_0;
   P2DIR &= ~SWITCHES;
-  
-  switch_update_interrupt_sense();
 }
 
 
 /* update switch interrupt to detect changes from current buttons */
 
-static u_char switch_update_interrupt_sense()
+u_char switch_update_interrupt_sense()
 {
   u_char p2val = P2IN;
   
@@ -128,7 +125,7 @@ static u_char switch_update_interrupt_sense()
 }
 
 
-static u_char random(u_char type)
+u_char msRand(u_char type)
 {
   u_char val;
   
@@ -153,7 +150,7 @@ void update_position(u_char col, u_char row)
 {
   /* Update current position*/
   
-  switch (nextPosition) {
+  switch (next_position) {
   case LEFT:
     if (col >= 10)
       col--;
@@ -217,7 +214,7 @@ void update_position(u_char col, u_char row)
     minCol = col;
   
   // draw pixel at current position
-  drawPixel(col, row, colors[current_font_color]);
+  drawPixel(col, row, msColors[current_font_color]);
 
   // update current position global variables
   current_position.col = col;
@@ -232,26 +229,26 @@ void update_shape()
     // lower resetScreen flag
     resetScreen = 0;
     // clear drawing and set random background
-    current_background = random(RAND_COLOR);
-    clearScreen(colors[current_background]);
+    current_background = msRand(RAND_COLOR);
+    clearScreen(msColors[current_background]);
     // reset cursor to random position
-    u_char randIndex = random(RAND_POSITION);
-    currentPostion.col = common_positions[randIndex].col;
-    currentPosition.row = common_positions[randIndex].row;
+    u_char randIndex = msRand(RAND_POSITION);
+    current_position.col = common_positions[randIndex].col;
+    current_position.row = common_positions[randIndex].row;
   }
   
   /* if no position change, determine if interrupt caused by SW_0 */
-  else if (nextPosition == NO_CHANGE) {
+  else if (next_position == NO_CHANGE) {
     // P1.3 buton pressed
     if (switchPort == 1) {
       // randomly change background and font colors
-      current_background = random(RAND_COLOR);
-      current_font_color = random(RAND_COLOR);
-      u_int string_backgound = colors[current_background];
-      u_int string_font_color = colors[current_font_color];
+      current_background = msRand(RAND_COLOR);
+      current_font_color = msRand(RAND_COLOR);
+      u_int string_background = msColors[current_background];
+      u_int string_font_color = msColors[current_font_color];
 
       // set a random (common) position for the string
-      u_char randIndex = random(RAND_POSITION);
+      u_char randIndex = msRand(RAND_POSITION);
       u_char stringCol = common_positions[randIndex].col;
       u_char stringRow = common_positions[randIndex].row;
 
@@ -261,7 +258,7 @@ void update_shape()
 
       // generate random string
       for (i = 0; i < STR_LENGTH-1; i++)
-	str[i] = random(RAND_CHARACTER);
+	str[i] = msRand(RAND_CHARACTER);
       
       // print random string
       for (i = 0; i < STR_LENGTH; i++) {
@@ -293,7 +290,7 @@ void update_shape()
       minCol -= 10;
       u_char width = maxRow - minRow;
       u_char height = maxCol - minCol;
-      drawRectOutline(minCol, minRow, width, height, colors[current_font_color]);
+      drawRectOutline(minCol, minRow, width, height, msColors[current_font_color]);
       // raise resetScreen flag (holds drawing for 5 seconds before resetting)
       resetScreen = 1;
     }
@@ -301,7 +298,7 @@ void update_shape()
 
   /* otherwise, update current position */
   else
-    updatePosition(current_position.col, current_position.row);
+    update_position(current_position.col, current_position.row);
 
   // lower redrawScreen flag
   redrawScreen = 0;
