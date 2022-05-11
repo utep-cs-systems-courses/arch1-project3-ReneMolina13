@@ -31,11 +31,11 @@
 /* LEDs & switches */
 #define LED BIT6    // represents P1.6 since P1.0 used for LCD
 #define SWITCHES 15 // all Port 2 switches
-#define SW_0 8      // P1.3
-#define SW_1 1      // P2.0
-#define SW_2 2      // P2.1
-#define SW_3 4      // P2.2
-#define SW_4 8      // P2.3
+#define SW_0 BIT3   // P1.3
+#define SW_1 BIT0   // P2.0
+#define SW_2 BIT1   // P2.1
+#define SW_3 BIT2   // P2.2
+#define SW_4 BIT3   // P2.3
 
 /* Used as flags for random function */
 #define RAND_POSITION  0
@@ -90,7 +90,7 @@ u_char maxCol;
 u_char maxRow;
 
 /* control flags */
-u_char resetScreen;        // flag that is set when the screen must be cleared
+/* u_char resetScreen;        // flag that is set when the screen must be cleared */
 u_char redrawScreen;       // flag that determines if a new draw operation is needed
 u_char switchPort;         // flag that determines if the pressed switch is P1 or P2
 u_char switches;           // holds the Port 2 switches currently pressed

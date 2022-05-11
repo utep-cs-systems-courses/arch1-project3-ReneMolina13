@@ -87,6 +87,22 @@ void msquares_init()
   redrawScreen = 0;
   switchPort = 0;
   switches = 0;
+
+
+
+  /* TEST */
+
+  // LED 0 - P1.1
+  // LED 1 - P1.2
+  // LED 2 - P1.3
+  // LED 3 - P2.4
+  // LED 4 - P2.5
+  // LED 5 - P2.7
+
+  P1DIR |= (BIT1 | BIT2);
+  P2DIR |= (BIT4 | BIT5 | BIT6 | BIT7);
+  P1OUT &= ~(BIT1 | BIT2);
+  P2OUT &= ~(BIT4 | BIT5 | BIT6 | BIT7);
 }
 
 
@@ -224,7 +240,8 @@ void update_position(u_char col, u_char row)
 
 void update_shape()
 {
-  /* check if screen must be cleared */
+  /*
+  // check if screen must be cleared
   if (resetScreen == 1) {
     // lower resetScreen flag
     resetScreen = 0;
@@ -236,11 +253,22 @@ void update_shape()
     current_position.col = common_positions[randIndex].col;
     current_position.row = common_positions[randIndex].row;
   }
+  */
   
   /* if no position change, determine if interrupt caused by SW_0 */
-  else if (next_position == NO_CHANGE) {
+  //  else if (next_position == NO_CHANGE) {
+  if (next_position == NO_CHANGE) {
     // P1.3 buton pressed
     if (switchPort == 1) {
+      // clear drawing and set random background
+      current_background = msRand(RAND_COLOR);
+      clearScreen(msColors[current_background]);
+      // reset cursor to random position
+      u_char randIndex = msRand(RAND_POSITION);
+      current_position.col = common_positions[randIndex].col;
+      current_position.row = common_positions[randIndex].row;
+      
+      /*
       // randomly change background and font colors
       current_background = msRand(RAND_COLOR);
       current_font_color = msRand(RAND_COLOR);
@@ -279,6 +307,7 @@ void update_shape()
 
       // raise resetScreen flag (holds drawing for 5 seconds before resetting)
       resetScreen = 1;
+      */
     }
 
     // all buttons released

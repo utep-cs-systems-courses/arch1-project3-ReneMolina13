@@ -43,24 +43,25 @@ void wdt_c_handler()
   if (posCount++ >= 16) {
     // update position
     posCount = 0;
-    if (next_position != NO_CHANGE && resetScreen == 0)
+    if (next_position != NO_CHANGE/* && resetScreen == 0*/)
       redrawScreen = 1;
   }
 
   if (fontCount++ >= 250) {
     // update font color
     fontCount = 0;
-    if (resetScreen == 0) {
-      redrawScreen = 1;
-      current_font_color = msRand(RAND_COLOR);
-    }
+    //    if (resetScreen == 0) {
+    redrawScreen = 1;
+    current_font_color = msRand(RAND_COLOR);
+      //    }
   }
-
+  /*
   if (resetCount++ >= 1250) {
     // emable screen reset
     resetCount = 0;
     redrawScreen = 1;
   }
+  */
 }
 
 
@@ -74,6 +75,7 @@ void switch_c_handler()
 
   // If switch 0 pressed: change background to random color & type a random string
   // activates resetScreen flag
+  // Curently just resets screen
 
   // If switch 1 pressed: place a pixel, move 1 pixel left (if possible)
 
