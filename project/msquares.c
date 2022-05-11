@@ -83,26 +83,10 @@ void msquares_init()
   maxCol = common_positions[MIDDLE].col;
   maxRow = common_positions[MIDDLE].row;
   // set control flags
-  resetScreen = 0;
+  //  resetScreen = 0;
   redrawScreen = 0;
   switchPort = 0;
   switches = 0;
-
-
-
-  /* TEST */
-
-  // LED 0 - P1.1
-  // LED 1 - P1.2
-  // LED 2 - P1.3
-  // LED 3 - P2.4
-  // LED 4 - P2.5
-  // LED 5 - P2.7
-
-  P1DIR |= (BIT1 | BIT2);
-  P2DIR |= (BIT4 | BIT5 | BIT6 | BIT7);
-  P1OUT &= ~(BIT1 | BIT2);
-  P2OUT &= ~(BIT4 | BIT5 | BIT6 | BIT7);
 }
 
 
@@ -321,7 +305,11 @@ void update_shape()
       u_char height = maxCol - minCol;
       drawRectOutline(minCol, minRow, width, height, msColors[current_font_color]);
       // raise resetScreen flag (holds drawing for 5 seconds before resetting)
-      resetScreen = 1;
+      // resetScreen = 1;
+      minCol = common_positions[MIDDLE].col;
+      minRow = common_positions[MIDDLE].row;
+      maxCol = common_positions[MIDDLE].col;
+      maxRow = common_positions[MIDDLE].row;
     }
   }
 
